@@ -1,3 +1,8 @@
 .canvas__apply-image {
   visibility: hidden;
 }
+
+.input-adjust {
+  margin-left: 40px;
+  width: 200px;
+}

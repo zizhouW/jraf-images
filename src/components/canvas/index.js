@@ -14,37 +14,41 @@ const createUnsafeImage = (src) => {
 }
 
 function Canvas(props) {
-  const canvasRef = useRef();
-  const [frameLeft, setFrameLeft] = useState(null);
-  const [frameMiddle, setFrameMiddle] = useState(null);
-  const [frameRight, setFrameRight] = useState(null);
-  const [image, setImage] = useState(null);
-  const [isShowDownload, setIsShowDownload] = useState(false);
-
   const {
     backgroundName,
     backgroundSrc,
     backgroundWidth,
     backgroundHeight,
-    startX,
-    startY,
+    startX: origStartX,
+    startY: origStartY,
     framePartWidth,
     framePartHeight,
     imageSrc,
     imageName,
   } = props;
 
+  const canvasRef = useRef();
+  const [background, setBackground] = useState(null);
+  const [frameLeft, setFrameLeft] = useState(null);
+  const [frameMiddle, setFrameMiddle] = useState(null);
+  const [frameRight, setFrameRight] = useState(null);
+  const [image, setImage] = useState(null);
+  const [isShowDownload, setIsShowDownload] = useState(false);
+  const [startX, setStartX] = useState(origStartX);
+  const [startY, setStartY] = useState(origStartY);
+
   useEffect(() => {
     if (canvasRef?.current) {
-      const background = createUnsafeImage(backgroundSrc);
+      const bg = createUnsafeImage(backgroundSrc);
+      setBackground(bg);
       setFrameLeft(createUnsafeImage(FrameLeft));
       setFrameMiddle(createUnsafeImage(FrameMiddle));
       setFrameRight(createUnsafeImage(FrameRight));
       setImage(createUnsafeImage(imageSrc));
 
       const context = canvasRef.current.getContext('2d');
-      background.onload = () => {
-        context.drawImage(background, 0, 0);
+      bg.onload = () => {
+        context.drawImage(bg, 0, 0);
       };
     }
   }, [canvasRef, backgroundSrc, imageSrc]);
@@ -85,11 +89,41 @@ function Canvas(props) {
     }
   };
 
+  const applyMoveImageXY = () => {
+    if (canvasRef?.current) {
+      const context = canvasRef.current.getContext('2d');
+      context.drawImage(background, 0, 0);
+      applyImg();
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    switch (event.key) {
+      case 'ArrowUp':
+        setStartY(startY - 1);
+        applyMoveImageXY();
+        break;
+      case 'ArrowDown':
+        setStartY(startY + 1);
+        applyMoveImageXY();
+        break;
+      case 'ArrowLeft':
+        setStartX(startX - 1);
+        applyMoveImageXY();
+        break;
+      case 'ArrowRight':
+        setStartX(startX + 1);
+        applyMoveImageXY();
+        break;
+    }
+  };
+
   return (
     <div className="canvas">
       <canvas ref={canvasRef} width={backgroundWidth} height={backgroundHeight}></canvas>
       <button className="canvas__apply-image" onClick={applyImg}>apply image</button>
-      {isShowDownload && <button className="canvas__download" onClick={download}>download image</button>}
+      {isShowDownload && <button className="canvas__download" onClick={download}>download</button>}
+      {isShowDownload && <input className='input-adjust' onKeyDown={handleKeyDown} placeholder='Use array keys to further adjust' />}
     </div>
   );
 }
