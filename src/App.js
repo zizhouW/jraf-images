@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Canvas from './components/canvas';
 import FileUpload from './components/file-upload';
 // import TestImage from './test_image_300_168.jpg';
@@ -25,6 +25,14 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    if (imageSrc) {
+      setTimeout(() => {
+        handleApply();
+      }, 100);
+    }
+  }, [imageSrc]);
+
   const handleDownload = () => {
     const downloadButtons = [...document.getElementsByClassName('canvas__download')];
 
@@ -37,7 +45,6 @@ function App() {
     <div className="App">
       <div className="header">
         <h1>Upload file or use drag & drop</h1>
-        {imageSrc && <button className="apply-all" onClick={handleApply}>Apply backgrounds</button>}
         {imageSrc && isApplied && <button className="download-all" onClick={handleDownload}>Download all</button>}
       </div>
       <FileUpload setImageName={setImageName} setImageSrc={setImageSrc} />
