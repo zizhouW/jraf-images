@@ -9,6 +9,7 @@ import { backgrounds } from './backgrounds';
 import './App.css';
 
 function App() {
+  const [imageName, setImageName] = useState('');
   const [imageSrc, setImageSrc] = useState(null);
   const [isApplied, setIsApplied] = useState(false);
 
@@ -39,11 +40,13 @@ function App() {
         {imageSrc && <button className="apply-all" onClick={handleApply}>Apply backgrounds</button>}
         {imageSrc && isApplied && <button className="download-all" onClick={handleDownload}>Download all</button>}
       </div>
-      <FileUpload setImageSrc={setImageSrc} />
-      {imageSrc && (
+      <FileUpload setImageName={setImageName} setImageSrc={setImageSrc} />
+      <p>{imageName ? `Image name: ${imageName}` : "no files uploaded yet"}</p>
+      {imageSrc && imageName && (
         backgrounds.map((background, idx) => (
           <Canvas
             key={idx}
+            backgroundName={background.name || `${idx}`}
             backgroundSrc={background.src}
             backgroundWidth={background.width}
             backgroundHeight={background.height}
@@ -52,6 +55,7 @@ function App() {
             startX={background.startX}
             startY={background.startY}
             imageSrc={imageSrc}
+            imageName={imageName}
           />
         ))
       )}

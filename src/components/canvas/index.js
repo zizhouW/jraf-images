@@ -22,6 +22,7 @@ function Canvas(props) {
   const [isShowDownload, setIsShowDownload] = useState(false);
 
   const {
+    backgroundName,
     backgroundSrc,
     backgroundWidth,
     backgroundHeight,
@@ -30,6 +31,7 @@ function Canvas(props) {
     framePartWidth,
     framePartHeight,
     imageSrc,
+    imageName,
   } = props;
 
   useEffect(() => {
@@ -77,7 +79,7 @@ function Canvas(props) {
   const download = () => {
     if (canvasRef.current) {
       var link = document.createElement('a');
-      link.download = 'display-image.png';
+      link.download = `${imageName}-${backgroundName}.png`;
       link.href = canvasRef.current.toDataURL('image/png');
       link.click();
     }

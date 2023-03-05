@@ -6,12 +6,15 @@ const fileTypes = ["JPEG", "PNG", "GIF", "JPG"];
 
 export default function FileUpload(props) {
   const handleChange = (file) => {
-    const { setImageSrc } = props;
+    const { setImageName, setImageSrc } = props;
     const fr = new FileReader();
+
     fr.onload = function () {
       setImageSrc(this.result);
     };
+
     fr.readAsDataURL(file);
+    setImageName(file.name.split('.').slice(0, -1).join('.'));
   };
 
   return (
@@ -21,7 +24,6 @@ export default function FileUpload(props) {
         name="file"
         types={fileTypes}
       />
-      {/* <p>{file ? `File name: ${file[0].name}` : "no files uploaded yet"}</p> */}
     </div>
   );
 }
