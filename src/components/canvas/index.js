@@ -3,6 +3,8 @@ import FrameLeft from './frame-left.png';
 import FrameMiddle from './frame-middle.png';
 import FrameRight from './frame-right.png';
 
+import './styles.css';
+
 const createUnsafeImage = (src) => {
   const image = new Image();
   image.src = src;
@@ -17,6 +19,7 @@ function Canvas(props) {
   const [frameMiddle, setFrameMiddle] = useState(null);
   const [frameRight, setFrameRight] = useState(null);
   const [image, setImage] = useState(null);
+  const [isShowDownload, setIsShowDownload] = useState(false);
 
   const {
     backgroundSrc,
@@ -44,7 +47,7 @@ function Canvas(props) {
     }
   }, [canvasRef, backgroundSrc, imageSrc]);
   
-  const addImg = () => {
+  const applyImg = () => {
     if (!(startX && startY && framePartWidth && framePartHeight && imageSrc)) {
       return;
     }
@@ -66,6 +69,8 @@ function Canvas(props) {
       const imagestartX = (startX + currentX + framePartWidth) / 2 - imageWidthAdjusted / 2;
       const imagestartY = startY + 2 * framePartWidth;
       context.drawImage(image, imagestartX, imagestartY, imageWidthAdjusted, imageHeightAdjusted);
+
+      setIsShowDownload(true);
     }
   };
 
@@ -81,8 +86,8 @@ function Canvas(props) {
   return (
     <div className="canvas">
       <canvas ref={canvasRef} width={backgroundWidth} height={backgroundHeight}></canvas>
-      <button onClick={addImg}>add image</button>
-      <button onClick={download}>download image</button>
+      <button className="canvas__apply-image" onClick={applyImg}>apply image</button>
+      {isShowDownload && <button className="canvas__download" onClick={download}>download image</button>}
     </div>
   );
 }

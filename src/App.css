@@ -1,3 +1,14 @@
 .App {
   height: 100%;
 }
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+
+.apply-all, .download-all {
+  font-size: 50px;
+}

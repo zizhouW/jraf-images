@@ -1,0 +1,6 @@
+label {
+  height: 350px !important;
+  width: 100%;
+  max-width: unset !important;
+  box-sizing: border-box;
+}
