@@ -1,7 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import FrameLeft from './frame-left.png';
-import FrameMiddle from './frame-middle.png';
-import FrameRight from './frame-right.png';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import './styles.css';
 
@@ -21,10 +18,18 @@ function Canvas(props) {
     backgroundHeight,
     startX: origStartX,
     startY: origStartY,
-    framePartWidth,
     framePartHeight,
     imageSrc,
     imageName,
+    frameSrcLeft,
+    frameSrcMiddle,
+    frameSrcRight,
+    frameWidthLeft,
+    frameWidthMiddle,
+    frameWidthRight,
+    frameHeight,
+    frameThickness,
+    frameWhiteSpace,
   } = props;
 
   const canvasRef = useRef();
@@ -41,9 +46,9 @@ function Canvas(props) {
     if (canvasRef?.current) {
       const bg = createUnsafeImage(backgroundSrc);
       setBackground(bg);
-      setFrameLeft(createUnsafeImage(FrameLeft));
-      setFrameMiddle(createUnsafeImage(FrameMiddle));
-      setFrameRight(createUnsafeImage(FrameRight));
+      setFrameLeft(createUnsafeImage(frameSrcLeft));
+      setFrameMiddle(createUnsafeImage(frameSrcMiddle));
+      setFrameRight(createUnsafeImage(frameSrcRight));
       setImage(createUnsafeImage(imageSrc));
 
       const context = canvasRef.current.getContext('2d');
@@ -51,34 +56,42 @@ function Canvas(props) {
         context.drawImage(bg, 0, 0);
       };
     }
-  }, [canvasRef, backgroundSrc, imageSrc]);
+  }, [canvasRef, backgroundSrc, imageSrc, frameSrcLeft, frameSrcMiddle, frameSrcRight, frameWhiteSpace]);
   
-  const applyImg = () => {
-    if (!(startX && startY && framePartWidth && framePartHeight && imageSrc)) {
+  const applyImg = useCallback(() => {
+    if (!(startX && startY && framePartHeight && imageSrc && frameLeft &&
+      frameMiddle && frameRight && frameWidthLeft && frameWidthMiddle &&
+      frameWidthRight && frameHeight && frameThickness && frameWhiteSpace !== undefined)) {
       return;
     }
 
-    const imageHeightAdjusted = framePartHeight - 4 * framePartWidth;
-    const imageWidthAdjusted = image.width * (imageHeightAdjusted / image.height);
+    const frameWidthMultiplier = framePartHeight / frameHeight;
 
+    const frameWidthLeftAdjusted = frameWidthLeft * frameWidthMultiplier;
+    const frameWidthMiddleAdjusted = frameWidthMiddle * frameWidthMultiplier;
+    const frameWidthRightAdjusted = frameWidthRight * frameWidthMultiplier;
+    const frameThicknessAdjusted = frameThickness * frameWidthMultiplier;
+
+    const imageHeightAdjusted = framePartHeight - 2 * (frameThicknessAdjusted + frameWhiteSpace);
+    const imageWidthAdjusted = image.width * (imageHeightAdjusted / image.height);
 
     if (canvasRef?.current) {
       const context = canvasRef.current.getContext('2d');
-      let currentX = startX + framePartWidth;
+      let currentX = startX + frameWidthLeftAdjusted;
       
-      context.drawImage(frameLeft, startX, startY, framePartWidth, framePartHeight);
-      for (currentX; (currentX - startX) < (imageWidthAdjusted + 3 * framePartWidth); currentX += framePartWidth) {
-        context.drawImage(frameMiddle, currentX, startY, framePartWidth, framePartHeight);
+      context.drawImage(frameLeft, startX, startY, frameWidthLeftAdjusted, framePartHeight);
+      for (currentX; (currentX - startX) < (frameWidthLeftAdjusted + imageWidthAdjusted + 2 * frameWhiteSpace); currentX += frameWidthMiddleAdjusted) {
+        context.drawImage(frameMiddle, currentX, startY, frameWidthMiddleAdjusted, framePartHeight);
       }
-      context.drawImage(frameRight, currentX, startY, framePartWidth, framePartHeight);
+      context.drawImage(frameRight, currentX, startY, frameWidthRightAdjusted, framePartHeight);
 
-      const imagestartX = (startX + currentX + framePartWidth) / 2 - imageWidthAdjusted / 2;
-      const imagestartY = startY + 2 * framePartWidth;
+      const imagestartX = (startX + currentX + frameWidthLeftAdjusted) / 2 - imageWidthAdjusted / 2;
+      const imagestartY = startY + frameThicknessAdjusted + frameWhiteSpace;
       context.drawImage(image, imagestartX, imagestartY, imageWidthAdjusted, imageHeightAdjusted);
 
       setIsShowDownload(true);
     }
-  };
+  }, [frameHeight, frameLeft, frameMiddle, framePartHeight, frameRight, frameThickness, frameWidthLeft, frameWidthMiddle, frameWidthRight, image, imageSrc, startX, startY, frameWhiteSpace]);
 
   const download = () => {
     if (canvasRef.current) {
@@ -114,6 +127,8 @@ function Canvas(props) {
       case 'ArrowRight':
         setStartX(startX + 1);
         applyMoveImageXY();
+        break;
+      default:
         break;
     }
   };

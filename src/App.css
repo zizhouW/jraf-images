@@ -12,3 +12,9 @@
 .download-all {
   font-size: 50px;
 }
+
+.frame-radio-buttons {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+}
